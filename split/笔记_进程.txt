@@ -1,0 +1,89 @@
+进程
+linux -->fork     windows -->multiprocessing
+    from multiprocessing import Process
+    Process(target= 函数 ，name=进程的名字 ，args=（给函数传递的对象）)
+        args 代表传递的参数，为可迭代对象，需要添加括号， 也可以传递多个，使用多个变量接收
+    对象调用方法：
+        Process.srart() --启动进程并执行任务
+        Process.run()   --执行任务但不会启动进程
+        terminate()     --终止
+进程池
+      进程达到复用，并且能够控制进程的数量。
+      from multiprocessing import Pool
+
+      非阻塞式
+      将所有任务添加到队列中，等待进程池中的一个任务结束之后再进入下一个任务。（当进程池中的进程数量小于任务总数）
+      p = Pool(4) --->设置进程池中进程数量
+      p.apply_async(函数，参数 args=(可迭代参数,) ,回调函数 callback=回调函数名)
+           callback回调函数，接收任务的返回值
+      p.close()
+      p.join()  # 堵住主进程，当主进程结束，进程池就会关闭
+      阻塞式
+      等待一个京城结束再添加其他进程执行，会在规定进程数之中使用进程号
+      p.apply(函数，args=,callback=)
+      其余相同
+
+      进程之间通信——----queue(队列)
+      from multiprocessing import Queue
+        q = Queue(4) ----队列数量
+        q.put("") ---放入队列
+        q.get() ---从队列中取出
+        当放入的数量或者取出的数量大于队列本身的数量的时候，程序就会卡住，需要添加参数
+          timeout（秒数）超时  用来抛出错误，跳出等待
+        q.full() ---- 判断队列是否满了
+        q.empty() ----- 判断队列是否为空
+
+线程
+        import threading
+        t = thearding.Thread(target=函数名,args=(参数,), )
+        t.start()
+          调用和进程相似
+        新建 - 就绪 - 阻塞 - 运行 - 结束
+        一个进程里面的线程能够共享进程的空间和资源，能够共用 全局变量
+        一个线程堵塞时候会马上开启下一个，但是没有优先顺序，等当前运行的线程结束
+        或者阻塞才会开启下一个线程
+        多线程同步
+        GIL-全局解释器锁--线程在进行时候就会直接抢占资源，导致一个线程不完全执行，在某个数重复使用
+        添加GIL 就会确保进程执行结束才让出空间，但是GIL 默认添加，会导致运行减速
+        在线程开启就会添加GIL，确保数据的安全，但是在线程计算计算密集型的时候就会被解开，
+
+        自定义线程
+        添加自定义的线程类，重写 run()和__init__()（init可以不写）
+        在主进程中添加线程对象，t1= 类名（）  并使用start执行
+
+        Lock锁
+
+        l.threading.Lock()
+
+        lock.acquire()  # 请求得到锁
+        lock.release()  # 释放锁   不解放就会导致其他线程不能够进入
+
+        死锁
+        当两个或者多个线程资源分配不均，两个线程同时占有资源并且等待对方的资源时候就会造成死锁，导致程序停止。
+
+        避免死锁
+        在lock.acquire(timeout=)  添加timeout参数超时跳过。
+        或者重构代码
+
+        线程之间通信-----queue  (两个线程之间的通信，通常叫做生产者和消费者)
+
+协程
+        微线程
+        使用方式：{
+        1，使用生成器 yield---next()
+        2, 使用greenlet（第三方包）手动调用，
+              from greenlet import greenlet
+              .
+              .
+              .
+              g1 = greenlet(函数名)
+              g1.switch()     # 在每个待加入线程的函数在阻塞前调用 .switch()
+        3，使用 gevent （第三方）自动调用
+              from gevent
+              from gevent import monkey
+              monkey.patch_all          # 使用猴子补丁，
+              在最后调用
+              ga = gevent.spawn(函数名)
+              ga.join()
+
+        }

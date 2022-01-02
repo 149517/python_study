@@ -1,0 +1,8 @@
+45, 进程
+linux -->fork     windows -->multiprocessing
+    from multiprocessing import Process
+    Process(target= 函数 ，name=进程的名字 ，args=（给函数传递的对象）)
+    对象调用方法：
+        Process.srart() --启动进程并执行任务
+        Process.run()   --执行任务但不会启动进程
+        terminate()     --终止
